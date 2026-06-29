@@ -1,17 +1,60 @@
-import { Button, VerticalBox } from "std-widgets.slint";
+import { VerticalBox, HorizontalBox, Switch, Palette } from "std-widgets.slint";
 
 export component AppWindow inherits Window {
-    in-out property <int> counter: 42;
-    callback request-increase-value();
+    title: "WCH-Next";
+    width: 320px;
+    height: 180px;
+
+    in property <bool> acw-status: true;
+    in property <string> active-app: "未检测到应用程序";
+    callback auto-center-window(bool);
+
     VerticalBox {
-        Text {
-            text: "Counter: \{root.counter}";
+        padding: 16px;
+        spacing: 16px;
+
+        // 自动居中开关
+        HorizontalBox {
+            spacing: 8px;
+
+            Text {
+                text: "自动居中";
+                color: Palette.foreground.transparentize(0.4);
+                font-size: 13px;
+                vertical-alignment: center;
+            }
+
+            Rectangle { }
+
+            Switch {
+                checked: root.acw-status;
+                toggled => {
+                    auto-center-window(self.checked);
+                }
+            }
         }
 
-        Button {
-            text: "Increase value";
-            clicked => {
-                root.request-increase-value();
+        // 当前活动应用
+        HorizontalBox {
+            spacing: 8px;
+
+            Text {
+                text: "当前应用";
+                color: Palette.foreground.transparentize(0.4);
+                font-size: 13px;
+                vertical-alignment: center;
+            }
+
+            Rectangle { }
+
+            Text {
+                text: active-app;
+                color: Palette.foreground;
+                font-size: 13px;
+                font-weight: 600;
+                overflow: elide;
+                vertical-alignment: center;
+                horizontal-alignment: right;
             }
         }
     }
