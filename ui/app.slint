@@ -1,4 +1,9 @@
-import { VerticalBox, HorizontalBox, Switch, Palette } from "std-widgets.slint";
+import {
+    VerticalBox,
+    HorizontalBox,
+    Switch,
+    Palette,
+} from "std-widgets.slint";
 
 export component AppWindow inherits Window {
     title: "WCH-Next";
@@ -8,6 +13,7 @@ export component AppWindow inherits Window {
     in property <bool> acw-status: true;
     in property <string> active-app: "未检测到应用程序";
     callback auto-center-window(bool);
+    // callback close-requested();
 
     VerticalBox {
         padding: 16px;
@@ -56,6 +62,32 @@ export component AppWindow inherits Window {
                 vertical-alignment: center;
                 horizontal-alignment: right;
             }
+        }
+    }
+}
+
+export component TrayIcon inherits SystemTrayIcon {
+    icon: @image-url("../assets/icon.png");
+    tooltip: "WCH-Next";
+
+    callback show-window();
+    callback hide-window();
+    callback quit-program();
+
+    Menu {
+        MenuItem {
+            title: "Show";
+            activated => { show-window(); }
+        }
+
+        MenuItem {
+            title: "Hide";
+            activated => { hide-window(); }
+        }
+
+        MenuItem {
+            title: "Quit";
+            activated => { quit-program(); }
         }
     }
 }

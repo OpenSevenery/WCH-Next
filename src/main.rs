@@ -17,9 +17,27 @@ slint::include_modules!();
 
 fn main() -> Result<(), Box<dyn Error>> {
     let ui = AppWindow::new()?;
-    let acw_status = Rc::new(Cell::new(true));
+    let ti = TrayIcon::new()?;
+
+    // 系统托盘功能
+    let ui_handle = ui.as_weak();
+    ti.on_show_window(move || {
+        if let Some(w) = ui_handle.upgrade() {
+            let _ = w.show();
+        }
+    });
+    let ui_handle = ui.as_weak();
+    ti.on_hide_window(move || {
+        if let Some(w) = ui_handle.upgrade() {
+            let _ = w.hide();
+        }
+    });
+    ti.on_quit_program(|| {
+        let _ = slint::quit_event_loop();
+    });
 
     // 自动窗口居中的开关回调
+    let acw_status = Rc::new(Cell::new(true));
     {
         let ui_handle = ui.as_weak();
         let acw_status = Rc::clone(&acw_status);
