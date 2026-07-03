@@ -11,9 +11,10 @@ export component AppWindow inherits Window {
     height: 180px;
 
     in property <bool> acw-status: true;
+    in property <bool> autorun-status: false;
     in property <string> active-app: "未检测到应用程序";
     callback auto-center-window(bool);
-    // callback close-requested();
+    callback set_autorun(bool);
 
     VerticalBox {
         padding: 16px;
@@ -36,6 +37,27 @@ export component AppWindow inherits Window {
                 checked: root.acw-status;
                 toggled => {
                     auto-center-window(self.checked);
+                }
+            }
+        }
+
+        // 自动启动开关
+        HorizontalBox {
+            spacing: 8px;
+
+            Text {
+                text: "自动启动";
+                color: Palette.foreground.transparentize(0.4);
+                font-size: 13px;
+                vertical-alignment: center;
+            }
+
+            Rectangle { }
+
+            Switch {
+                checked: root.autorun-status;
+                toggled => {
+                    set_autorun(self.checked);
                 }
             }
         }

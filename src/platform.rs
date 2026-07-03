@@ -1,4 +1,8 @@
-use std::path::Path;
+use std::{
+    env,
+    path::Path,
+    process::{Command, Stdio},
+};
 
 use windows::{
     Win32::{
@@ -32,9 +36,15 @@ pub trait PlatformApi {
 
     /// 将指定窗口居中到其所在显示器的工作区
     fn center_window(&self, hwnd: HWND) -> windows::core::Result<()>;
+
+    // 添加自动启动
+    fn enable_autorun(&self) -> windows::core::Result<()>;
+    // 移除自动启动
+    fn disable_autorun(&self) -> windows::core::Result<()>;
 }
 
 // Windows 平台实现
+#[derive(Copy, Clone)]
 pub struct WindowsPlatformApi;
 
 impl PlatformApi for WindowsPlatformApi {
@@ -87,6 +97,47 @@ impl PlatformApi for WindowsPlatformApi {
                 SWP_NOSIZE | SWP_NOZORDER | SWP_NOACTIVATE,
             )?
         };
+
+        Ok(())
+    }
+
+    fn enable_autorun(&self) -> windows::core::Result<()> {
+        let exe_path = env::current_exe()
+            .expect("Failed to get exe path")
+            .display()
+            .to_string();
+
+        Command::new("reg")
+            .args([
+                "add",
+                r"HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Run",
+                "/v",
+                "WCH-Next",
+                "/t",
+                "REG_SZ",
+                "/d",
+                &exe_path,
+                "/f",
+            ])
+            .stdout(Stdio::null())
+            .status()
+            .expect("Failed to create task");
+
+        Ok(())
+    }
+
+    fn disable_autorun(&self) -> windows::core::Result<()> {
+        Command::new("reg")
+            .args([
+                "delete",
+                r"HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Run",
+                "/v",
+                "WCH-Next",
+                "/f",
+            ])
+            .stdout(Stdio::null())
+            .status()
+            .expect("Failed to delete task");
 
         Ok(())
     }

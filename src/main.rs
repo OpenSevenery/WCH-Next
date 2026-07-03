@@ -18,6 +18,7 @@ slint::include_modules!();
 fn main() -> Result<(), Box<dyn Error>> {
     let ui = AppWindow::new()?;
     let ti = TrayIcon::new()?;
+    let api = WindowsPlatformApi;
 
     // 系统托盘功能
     let ui_handle = ui.as_weak();
@@ -50,12 +51,27 @@ fn main() -> Result<(), Box<dyn Error>> {
         });
     }
 
+    // 自动启动的开关回调
+    {
+        let ui_handle = ui.as_weak();
+
+        ui.on_set_autorun(move |enabled| {
+            if enabled {
+                let _ = api.enable_autorun();
+            } else {
+                let _ = api.disable_autorun();
+            }
+            if let Some(ui) = ui_handle.upgrade() {
+                ui.set_autorun_status(enabled);
+            }
+        });
+    }
+
     // 定时检测活动窗口是否需要居中
     let _timer;
     {
         let ui_handle = ui.as_weak();
         let acw_status = Rc::clone(&acw_status);
-        let api = WindowsPlatformApi;
         let seen_hwnds: Rc<RefCell<HashSet<isize>>> = Rc::new(RefCell::new(HashSet::new()));
 
         _timer = slint::Timer::default();
