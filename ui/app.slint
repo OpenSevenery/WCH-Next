@@ -6,6 +6,7 @@ import {
 } from "std-widgets.slint";
 
 export component AppWindow inherits Window {
+    icon: @image-url("../assets/icon.svg");
     title: "WCH-Next";
     width: 320px;
     height: 180px;
@@ -89,7 +90,7 @@ export component AppWindow inherits Window {
 }
 
 export component TrayIcon inherits SystemTrayIcon {
-    icon: @image-url("../assets/icon.png");
+    icon: @image-url("../assets/icon.svg");
     tooltip: "WCH-Next";
 
     callback show-window();
